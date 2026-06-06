@@ -118,7 +118,9 @@
         <div class="max-w-screen-xl mx-auto flex items-center gap-8 text-sm font-bold">
             <button onclick="renderStoreApps(appsDatabase)" class="hover:text-orange-400 transition cursor-pointer">الكل</button>
             <button onclick="filterNewApps()" class="hover:text-orange-400 transition cursor-pointer">برامج جديدة (آخر 5 أيام)</button>
-            <div id="nav-auth-container" class="flex items-center border-r border-slate-700 pr-6 mr-2"></div>
+            <div id="nav-auth-container" class="flex items-center border-r border-slate-700 pr-6 mr-2">
+                <!-- لن يظهر رابط دخول الإدارة هنا للعامة -->
+            </div>
         </div>
     </nav>
 
@@ -134,7 +136,7 @@
             </div>
         </section>
 
-    <!-- لوحة تحكم المدير (تظهر فقط عند تسجيل دخول الأدمن) -->
+    <!-- لوحة تحكم المدير (تظهر فقط عند تسجيل دخول الأدمن) --> 
     <div id="admin-panel-overlay" class="max-w-screen-xl mx-auto px-4 mt-8 hidden">
         <section id="admin-dashboard-section" class="bg-slate-800 border-2 border-orange-500/30 rounded-2xl p-6 mb-8 reveal active">
             <div class="flex items-center justify-between mb-6">
