@@ -34,6 +34,45 @@
         ::-webkit-scrollbar-track { background: #0f172a; } /* slate-900 */
         ::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; } /* indigo-600 */
         ::-webkit-scrollbar-thumb:hover { background: #6366f1; } /* indigo-500 */
+
+        /* الأنميشن الخاص بالتعليقات */
+        .comment-fade-in { animation: slideUp 0.5s ease-out forwards; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .shrink-out { animation: shrink 0.4s ease-in forwards; pointer-events: none; }
+        @keyframes shrink {
+            0% { transform: scale(1); opacity: 1; background-color: rgba(239, 68, 68, 0.1); }
+            100% { transform: scale(0.8); opacity: 0; height: 0; margin: 0; padding: 0; }
+        }
+
+        /* Spinner CSS */
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #f97316;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Toast Notification */
+        #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 100; }
+        .toast {
+            background: #1e293b;
+            border-right: 4px solid #f97316;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideInLeft 0.3s ease-out;
+        }
+        @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
@@ -79,6 +118,7 @@
         <div class="max-w-screen-xl mx-auto flex items-center gap-8 text-sm font-bold">
             <button onclick="renderStoreApps(appsDatabase)" class="hover:text-orange-400 transition cursor-pointer">الكل</button>
             <button onclick="filterNewApps()" class="hover:text-orange-400 transition cursor-pointer">برامج جديدة (آخر 5 أيام)</button>
+            <div id="nav-auth-container" class="flex items-center border-r border-slate-700 pr-6 mr-2"></div>
         </div>
     </nav>
 
@@ -94,8 +134,39 @@
             </div>
         </section>
 
+    <!-- لوحة تحكم المدير (تظهر فقط عند تسجيل دخول الأدمن) -->
+    <div id="admin-panel-overlay" class="max-w-screen-xl mx-auto px-4 mt-8 hidden">
+        <section id="admin-dashboard-section" class="bg-slate-800 border-2 border-orange-500/30 rounded-2xl p-6 mb-8 reveal active">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-black text-orange-500 flex items-center gap-2">
+                    <i class="fa-solid fa-gauge-high"></i> لوحة تحكم المدير - إضافة برنامج جديد
+                </h3>
+                <button onclick="toggleAdminDashboard()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-circle-chevron-up"></i> إخفاء</button>
+            </div>
+            <form onsubmit="publishNewApp(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <input type="text" id="app-name" placeholder="اسم البرنامج" required class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
+                <select id="app-category" class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
+                    <option value="متصفحات">متصفحات</option>
+                    <option value="أدوات مساعدة">أدوات مساعدة</option>
+                    <option value="الوسائط">الوسائط</option>
+                    <option value="الحماية">الحماية</option>
+                    <option value="ألعاب">ألعاب</option>
+                </select>
+                <input type="text" id="app-size" placeholder="الحجم (مثال: 50 MB)" required class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
+                <input type="text" id="app-version" placeholder="الإصدار (مثال: v2.0)" required class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
+                <input type="url" id="app-link" placeholder="رابط التحميل المباشر" required class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
+                <input type="url" id="app-icon" placeholder="رابط أيقونة البرنامج (URL)" class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
+                <textarea id="app-desc" placeholder="وصف مختصر للبرنامج ومميزاته..." required class="md:col-span-2 lg:col-span-3 bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500 h-24"></textarea>
+                <div class="lg:col-start-3">
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-orange-500/20 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus-circle"></i> نشر البرنامج في المتجر
+                    </button>
+                </div>
+            </form>
+        </section>
+    </div>
+
         <div class="max-w-screen-xl mx-auto px-4 py-8 md:py-12 space-y-12">
-            
             <!-- All Products Grid -->
             <section id="product-grid-section" class="space-y-6 reveal">
                 <h3 class="text-2xl font-bold text-white flex items-center gap-2">
@@ -106,8 +177,38 @@
                 </div>
             </section>
 
+            <!-- قسم التعليقات والمراجعات -->
+            <section id="comments-section" class="pt-12 border-t border-slate-800 reveal">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <!-- نموذج إضافة تعليق -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <h3 class="text-xl font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-comment-dots text-orange-500"></i> أضف رأيك بالمتجر
+                        </h3>
+                        <div id="auth-container" class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                            <!-- يتم توليد واجهة المستخدم أو نموذج التعليق هنا -->
+                        </div>
+                    </div>
+
+                    <!-- قائمة التعليقات -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-xl font-bold">آراء المستخدمين</h3>
+                            <span id="admin-badge" class="hidden bg-red-900/30 text-red-400 text-[10px] px-2 py-1 rounded border border-red-800">لوحة التحكم نشطة</span>
+                        </div>
+                        <div id="comments-display" class="space-y-4">
+                            <!-- يتم توليد التعليقات هنا -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </main>
+
+    <!-- حاوية الإشعارات -->
+    <div id="toast-container"></div>
+
 
     <!-- Amazon-like Footer -->
     <footer class="bg-gray-900 text-gray-300 py-10">
@@ -135,5 +236,19 @@
 
     <!-- ربط محرك التحكم البرمجي التفاعلي خالي الأخطاء -->
     <script src="index.js"></script>
+    
+    <script>
+        // حماية الواجهة: منع النقر الأيمن وتعطيل اختصارات أدوات المطورين
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode == 123) return false; // F12
+            if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) return false; // Ctrl+Shift+I/J
+            if (e.ctrlKey && e.keyCode == 85) return false; // Ctrl+U (View Source)
+        });
+
+        // تشويه مخرجات الكونسول للمتطفلين
+        console.log("%cتنبيه أمني!", "color: red; font-size: 30px; font-weight: bold;");
+        console.log("%cهذه المنطقة مخصصة للمطورين فقط. محاولة العبث هنا قد تؤدي لحظر جهازك نهائياً.", "color: white; font-size: 16px;");
+    </script>
 </body>
 </html>
