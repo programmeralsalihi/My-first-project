@@ -9,6 +9,8 @@ let commentsDatabase = storedComments ? JSON.parse(storedComments) : [];
 // كلمات محظورة للفلترة التلقائية
 const bannedWords = ["مسيء", "سيء", "خداع", "فايروس", "كذب"];
 
+let currentCategory = 'برامج وتطبيقات الكمبيوتر'; // تتبع القسم الحالي
+
 let isAdminMode = sessionStorage.getItem('isAdminSession') === 'true'; // استعادة حالة الإدارة
 let currentUser = JSON.parse(localStorage.getItem('user_profile')) || null; // بيانات المستخدم العادي
 const isDeviceBanned = localStorage.getItem('site_blacklist') === 'true'; // فحص الحظر النهائي
@@ -18,7 +20,7 @@ const defaultApps = [
     {
         id: 1,
         name: "تحميل كوكل كروم للكمبيوتر",
-        category: "متصفحات", 
+        category: "برامج وتطبيقات الكمبيوتر", 
         size: "120 MB",
         version: "أحدث إصدار",
         desc: "يعتبر متصفح جوجل كروم المتصفح الأكثر سرعة وأماناً وتوافقاً مع معايير الويب الحديثة، مما يوفر تجربة تصفح مثالية لمستخدمي الكمبيوتر.",
@@ -29,7 +31,7 @@ const defaultApps = [
     {
         id: 2,
         name: "WinRAR",
-        category: "أدوات مساعدة",
+        category: "برامج وتطبيقات الكمبيوتر",
         size: "5 MB",
         version: "أحدث إصدار",
         desc: "برنامج WinRAR لفك ضغط الملفات هو أداة قوية وموثوقة لإدارة الملفات المضغوطة، ويدعم العديد من التنسيقات مثل RAR وZIP.",
@@ -40,7 +42,7 @@ const defaultApps = [
     {
         id: 3,
         name: "تحميل مشغل الوسائط VLC",
-        category: "الوسائط",
+        category: "برامج وتطبيقات الكمبيوتر",
         size: "40 MB",
         version: "3.0.20",
         desc: "VLC هو مشغل وسائط حر ومفتوح المصدر، قادر على تشغيل معظم ملفات الوسائط بالإضافة إلى الأقراص المدمجة وبروتوكولات البث.",
@@ -51,13 +53,134 @@ const defaultApps = [
     {
         id: 4,
         name: "Internet Download Manager",
-        category: "أدوات مساعدة",
+        category: "برامج وتطبيقات الكمبيوتر",
         size: "10 MB",
         version: "6.42",
         desc: "أداة قوية لزيادة سرعات التنزيل حتى 5 مرات، واستئناف التنزيلات المجدولة وتنظيمها.",
         downloadLink: "https://www.internetdownloadmanager.com/download.html",
         publishDate: new Date().toISOString(), // هذا سيظهر في قسم البرامج الجديدة
         icon: "https://cdn.icon-icons.com/icons2/2368/PNG/512/internet_download_manager_idm_icon_143714.png"
+    },
+    {
+        id: 5,
+        name: "Windows 11 Pro 23H2",
+        category: "أنظمة تشغيل الكمبيوتر",
+        size: "5.4 GB",
+        version: "23H2 الرسمي",
+        desc: "أحدث إصدار من نظام تشغيل ويندوز 11، يتضمن كافة التحديثات الأمنية والميزات الجديدة مع واجهة عصرية وسرعة فائقة في الأداء.",
+        downloadLink: "https://www.microsoft.com/software-download/windows11",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn-icons-png.flaticon.com/512/732/732221.png"
+    },
+    {
+        id: 6,
+        name: "تعريف كرت الشاشة NVIDIA",
+        category: "تعاريف الحاسوب",
+        size: "650 MB",
+        version: "v551.23",
+        desc: "التعريف الرسمي لبطاقات الرسوميات NVIDIA GeForce، لضمان أفضل أداء للألعاب وبرامج التصميم الجرافيكي على حاسوبك.",
+        downloadLink: "https://www.nvidia.com/download/index.aspx",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn-icons-png.flaticon.com/512/873/873130.png"
+    },
+    {
+        id: 7,
+        name: "تليجرام للكمبيوتر (Telegram)",
+        category: "برامج وتطبيقات الكمبيوتر",
+        size: "35 MB",
+        version: "v5.1.1",
+        desc: "نسخة سطح المكتب من تطبيق المراسلة الشهير تليجرام، يتميز بالسرعة العالية والأمان التام والمزامنة الفورية مع هاتفك المحمول.",
+        downloadLink: "https://desktop.telegram.org/",
+        publishDate: "2024-01-01",
+        icon: "https://cdn.icon-icons.com/icons2/2108/PNG/512/telegram_logo_icon_134595.png"
+    },
+    {
+        id: 8,
+        name: "متصفح بريف (Brave Browser)",
+        category: "برامج وتطبيقات الكمبيوتر",
+        size: "95 MB",
+        version: "أحدث إصدار",
+        desc: "متصفح إنترنت سريع جداً يركز على الخصوصية، يقوم بحظر الإعلانات المزعجة والمتعقبات تلقائياً مما يوفر تجربة تصفح آمنة ومريحة.",
+        downloadLink: "https://brave.com/download/",
+        publishDate: "2024-01-01",
+        icon: "https://cdn.icon-icons.com/icons2/2107/PNG/512/brave_browser_logo_icon_134160.png"
+    },
+    {
+        id: 9,
+        name: "Microsoft Office 2021",
+        category: "برامج وتطبيقات الكمبيوتر",
+        size: "4.2 GB",
+        version: "Professional Plus",
+        desc: "الحزمة المكتبية الأهم عالمياً، تضم Word و Excel و PowerPoint و Outlook مع ميزات الإنتاجية الحديثة والواجهة المتطورة.",
+        downloadLink: "#",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn.icon-icons.com/icons2/2397/PNG/512/microsoft_office_logo_icon_145720.png"
+    },
+    {
+        id: 10,
+        name: "Adobe Photoshop 2024",
+        category: "برامج وتطبيقات الكمبيوتر",
+        size: "3.5 GB",
+        version: "v25.0",
+        desc: "البرنامج الرائد عالمياً في تعديل الصور والتصميم الجرافيكي، يدعم ميزات الذكاء الاصطناعي التوليدي الجديدة.",
+        downloadLink: "#",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn.icon-icons.com/icons2/3053/PNG/512/adobe_photoshop_macos_bigsur_icon_190369.png"
+    },
+    {
+        id: 11,
+        name: "Windows 10 Pro (64-bit)",
+        category: "أنظمة تشغيل الكمبيوتر",
+        size: "5.1 GB",
+        version: "22H2 الأصلي",
+        desc: "نسخة ويندوز 10 الأكثر استقراراً، مثالية للأجهزة التي لا تدعم ويندوز 11 مع دعم كامل لكافة التحديثات الأمنية.",
+        downloadLink: "https://www.microsoft.com/software-download/windows10",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn-icons-png.flaticon.com/512/732/732221.png"
+    },
+    {
+        id: 12,
+        name: "Windows 7 Ultimate",
+        category: "أنظمة تشغيل الكمبيوتر",
+        size: "3.2 GB",
+        version: "SP1 (64-bit)",
+        desc: "النسخة الكلاسيكية الخفيفة، مناسبة جداً للأجهزة القديمة والضعيفة وتتميز بواجهة بسيطة وسرعة في الأداء.",
+        downloadLink: "#",
+        publishDate: "2024-01-01",
+        icon: "https://cdn-icons-png.flaticon.com/512/732/732221.png"
+    },
+    {
+        id: 13,
+        name: "Realtek High Definition Audio Driver",
+        category: "تعاريف الحاسوب",
+        size: "250 MB",
+        version: "v6.0.96",
+        desc: "التعريف الرسمي والشامل لمعظم كروت الصوت المدمجة في اللوحات الأم، يضمن لك الحصول على أفضل جودة صوت.",
+        downloadLink: "https://www.realtek.com/en/downloads",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn-icons-png.flaticon.com/512/1150/1150604.png"
+    },
+    {
+        id: 14,
+        name: "Intel Graphics Driver (DCH)",
+        category: "تعاريف الحاسوب",
+        size: "540 MB",
+        version: "أحدث إصدار 2024",
+        desc: "تعريف معالجات الرسوميات المدمجة من إنتل (Intel UHD/Iris Xe) لتحسين أداء العرض ودعم تشغيل الألعاب بدقة عالية.",
+        downloadLink: "https://www.intel.com/content/www/us/en/download-center/home.html",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn-icons-png.flaticon.com/512/5969/5969110.png"
+    },
+    {
+        id: 15,
+        name: "AMD Adrenalin Edition Driver",
+        category: "تعاريف الحاسوب",
+        size: "620 MB",
+        version: "v24.1.1",
+        desc: "برنامج وتعاريف كروت الشاشة AMD Radeon، يوفر لوحة تحكم متقدمة لضبط إعدادات الجرافيك وتحسين الأداء.",
+        downloadLink: "https://www.amd.com/en/support",
+        publishDate: new Date().toISOString(),
+        icon: "https://cdn-icons-png.flaticon.com/512/5969/5969064.png"
     }
 ];
 
@@ -74,7 +197,8 @@ localStorage.setItem('my_apps_store', JSON.stringify(appsDatabase));
 // إطلاق وتحميل البيانات في الواجهة فور تشغيل المتصفح مباشرة
 document.addEventListener("DOMContentLoaded", function() {
     checkAdminAccess(); // فحص إذا كنت داخلاً من البوابة السرية
-    renderStoreApps(appsDatabase);
+    // عرض قسم البرامج كافتراضي عند التحميل
+    switchMainTab('برامج وتطبيقات الكمبيوتر', document.querySelector('.tab-btn'));
     initRevealOnScroll();
     renderCommentForm();
     renderComments();
@@ -91,13 +215,34 @@ function initRevealOnScroll() {
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 }
 
+// دالة التبديل بين الأقسام الثلاثة الكبرى
+function switchMainTab(category, btn) {
+    currentCategory = category; // تحديث القسم النشط حالياً
+
+    // تحديث شكل الأزرار
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active-tab', 'text-white'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.add('text-slate-400'));
+    if(btn) {
+        btn.classList.add('active-tab');
+        btn.classList.remove('text-slate-400');
+    }
+
+    // تصفية البيانات وعرضها
+    const filtered = appsDatabase.filter(app => app.category === category);
+    renderStoreApps(filtered);
+}
+
 // دالة حقن وتوليد كروت التطبيقات والبرامج في المتجر العام باحترافية وتناسق عالي
 function renderStoreApps(appsArray) {
     const grid = document.getElementById("product-grid"); // Changed ID to product-grid
     const adminToken = sessionStorage.getItem('admin_token');
     const isVerifiedAdmin = isAdminMode && adminToken === "20obaida44";
+    const categoryTitle = document.getElementById("current-category-title");
 
-    grid.innerHTML = "";
+    // تحديث عنوان القسم ليعكس الفئة الحالية
+    if (categoryTitle) {
+        categoryTitle.innerHTML = `<i class="fa-solid fa-th-large text-blue-600"></i> ${currentCategory}`;
+    }
 
     if (appsArray.length === 0) {
         grid.innerHTML = `
@@ -109,38 +254,40 @@ function renderStoreApps(appsArray) {
         return;
     }
 
+    grid.innerHTML = "";
     appsArray.forEach((app, index) => {
+        const dateFormatted = new Date(app.publishDate).toLocaleDateString('ar-EG');
         grid.innerHTML += `
             <div class="glow-card rounded-lg shadow-xl p-6 flex flex-col text-right reveal">
                 <div class="flex justify-between items-start mb-4">
-                    <span class="bg-blue-900/50 text-blue-300 text-[10px] font-bold px-3 py-1 rounded border border-blue-800/50 uppercase tracking-wider">${app.category}</span>
+                     <span class="bg-slate-900 text-blue-400 text-[9px] font-bold px-2 py-1 rounded border border-blue-500/20"><i class="fa-solid fa-calendar-day ml-1"></i> ${dateFormatted}</span>
                     <span class="text-slate-400 text-xs font-bold"><i class="fa-solid fa-hard-drive ml-1"></i> ${app.size}</span>
                 </div>
                 <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-slate-700/50 rounded-lg flex items-center justify-center text-2xl text-orange-500 shadow-inner p-1">
+                    <div class="w-12 h-12 bg-slate-700/50 rounded-lg flex items-center justify-center text-2xl text-blue-500 shadow-inner p-1">
                         <img 
                             src="${app.icon && app.icon.trim() !== '' ? app.icon : 'https://cdn-icons-png.flaticon.com/512/5164/5164023.png'}" 
                             alt="${app.name}" 
                             class="w-12 h-12 object-contain block"
                             loading="lazy"
-                            onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/5164/5164023.png';"
+                            onerror="this.src='https://cdn-icons-png.flaticon.com/512/5164/5164023.png';"
                         >
                     </div>
                     <div>
-                        <h4 class="font-bold text-white text-lg tracking-tight">${app.name}</h4>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase" dir="ltr">الإصدار: <span class="text-orange-500">${app.version}</span></p>
+                        <h4 class="font-black text-white text-lg tracking-tight">${app.name}</h4>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase" dir="ltr">الإصدار: <span class="text-blue-400">${app.version}</span></p>
                     </div>
                 </div>
                 <p class="text-sm text-slate-300 leading-relaxed line-clamp-3 mb-6 flex-grow font-medium">${app.desc}</p>
 
                 ${isVerifiedAdmin ? `
-                <div class="mb-4 flex justify-end border-t border-slate-700/50 pt-3">
+                <div class="mb-4 flex justify-end border-t border-slate-800 pt-3">
                     <button onclick="deleteApp(${app.id})" class="text-[10px] bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition flex items-center gap-1"><i class="fa-solid fa-trash-can"></i> حذف البرنامج</button>
                 </div>
                 ` : ''}
                 
-                <div class="pt-4 border-t border-slate-700/50">
-                    <a href="${app.downloadLink}" target="_blank" rel="noopener noreferrer" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-4 rounded-md text-sm text-center flex items-center justify-center gap-2 transition duration-300 shadow-sm active:scale-95">
+                <div class="pt-4 border-t border-slate-800">
+                    <a href="${app.downloadLink}" target="_blank" rel="noopener noreferrer" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-full text-sm text-center flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-blue-500/20 active:scale-95">
                         <i class="fa-solid fa-cloud-arrow-down"></i> تحميل مباشر مجاني
                     </a>
                 </div>
@@ -156,7 +303,9 @@ function deleteApp(id) {
         appsDatabase = appsDatabase.filter(app => app.id !== id);
         localStorage.setItem('my_apps_store', JSON.stringify(appsDatabase));
         showToast("تم حذف البرنامج بنجاح.", "bg-red-600");
-        renderStoreApps(appsDatabase);
+        // إعادة عرض القسم الحالي فقط بعد الحذف
+        const filtered = appsDatabase.filter(app => app.category === currentCategory);
+        renderStoreApps(filtered);
     }
 }
 
@@ -193,18 +342,17 @@ function publishNewApp(event) {
     localStorage.setItem('my_apps_store', JSON.stringify(appsDatabase));
 
     // إعادة تصفير الاستمارة
-    document.getElementById("app-name").value = "";
-    document.getElementById("app-size").value = "";
-    document.getElementById("app-version").value = "";
-    document.getElementById("app-link").value = "";
-    document.getElementById("app-desc").value = "";
-    if (document.getElementById("app-icon")) document.getElementById("app-icon").value = "";
+    event.target.reset();
 
-    // تحديث العرض في المتجر العام تلقائياً بالبرنامج الجديد
-    renderStoreApps(appsDatabase);
+    // الانتقال فوراً للقسم الذي تم إضافة البرنامج إليه
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    let targetBtn = Array.from(tabButtons).find(btn => btn.innerText.includes(category));
+    switchMainTab(category, targetBtn);
 
-    // تحويل تلقائي فوري للمتجر العام لرؤية التطبيق الجديد وهو منشور
-    if (typeof switchTab === "function") switchTab('store');
+    showToast("تم نشر البرنامج بنجاح في قسم " + category, "bg-green-600");
+    
+    // التمرير لأسفل لرؤية البرنامج الجديد
+    document.getElementById('product-grid-section').scrollIntoView({ behavior: 'smooth' });
 }
 
 // دالة إظهار/إخفاء لوحة تحكم المدير
@@ -549,7 +697,19 @@ function renderComments() {
                     
                     ${isVerifiedAdmin ? `
                         <div class="mt-3 flex gap-2 justify-end border-t border-slate-700/50 pt-2">
-                            <button onclick="deleteComment(${comment.id})" class="text-[10px] bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white transition">حذف</button>
+                            ${isPending ? `
+                                <button onclick="approveComment(${comment.id})" class="text-[10px] bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-md text-white font-bold transition flex items-center gap-1 shadow-lg shadow-green-900/20">
+                                    <i class="fa-solid fa-check"></i> قبول النشر
+                                </button>
+                                <button onclick="rejectComment(${comment.id})" class="text-[10px] bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-md text-white font-bold transition flex items-center gap-1 shadow-lg shadow-red-900/20">
+                                    <i class="fa-solid fa-xmark"></i> رفض وحذف
+                                </button>
+                            ` : `
+                                <button onclick="pinComment(${comment.id})" class="text-[10px] bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-white transition">
+                                    ${comment.pinned ? 'إلغاء التثبيت' : 'تثبيت'}
+                                </button>
+                                <button onclick="deleteComment(${comment.id})" class="text-[10px] bg-red-600 hover:bg-red-700 px-2 py-1 rounded text-white transition">حذف</button>
+                            `}
                         </div>
                     ` : ''}
                 </div>
@@ -557,6 +717,33 @@ function renderComments() {
         `;
         container.appendChild(card);
     });
+}
+
+// دالة قبول التعليق (تغيير الحالة من معلق إلى مقبول)
+function approveComment(id) {
+    const comment = commentsDatabase.find(c => c.id === id);
+    if (comment) {
+        comment.status = 'approved';
+        localStorage.setItem('my_apps_comments', JSON.stringify(commentsDatabase));
+        showToast("تمت الموافقة بنجاح! التعليق الآن مرئي للجميع.", "bg-green-600");
+        renderComments();
+    }
+}
+
+// دالة رفض وحذف التعليق
+function rejectComment(id) {
+    if (confirm("هل أنت متأكد من رفض وحذف هذا التعليق نهائياً؟")) {
+        // نستخدم دالة الحذف الموجودة مسبقاً مع أنميشن التلاشي
+        deleteComment(id);
+        // سيقوم deleteComment بعرض التنبيه وإعادة الرندرة تلقائياً
+    }
+}
+
+function pinComment(id) {
+    const comment = commentsDatabase.find(c => c.id === id);
+    if (comment) comment.pinned = !comment.pinned;
+    localStorage.setItem('my_apps_comments', JSON.stringify(commentsDatabase));
+    renderComments();
 }
 
 function deleteComment(id) {

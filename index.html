@@ -73,6 +73,14 @@
             animation: slideInLeft 0.3s ease-out;
         }
         @keyframes slideInLeft { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+        /* تنسيق التبويبات النشطة */
+        .tab-btn.active-tab {
+            background: linear-gradient(135deg, #4f46e5, #3b82f6); /* بنفسجي إلى أزرق فخم */
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
@@ -114,12 +122,20 @@
     </header>
 
     <!-- Main Navigation (below header) -->
-    <nav class="bg-gray-800 text-white p-2 shadow-sm">
-        <div class="max-w-screen-xl mx-auto flex items-center gap-8 text-sm font-bold">
-            <button onclick="renderStoreApps(appsDatabase)" class="hover:text-orange-400 transition cursor-pointer">الكل</button>
-            <button onclick="filterNewApps()" class="hover:text-orange-400 transition cursor-pointer">برامج جديدة (آخر 5 أيام)</button>
-            <div id="nav-auth-container" class="flex items-center border-r border-slate-700 pr-6 mr-2">
-                <!-- لن يظهر رابط دخول الإدارة هنا للعامة -->
+    <nav class="bg-gray-800 text-white border-b border-slate-700 sticky top-[64px] z-40 shadow-lg">
+        <div class="max-w-screen-xl mx-auto flex items-center justify-between p-1">
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-2">
+                <button onclick="switchMainTab('برامج وتطبيقات الكمبيوتر', this)" class="tab-btn active-tab px-5 py-2.5 rounded-lg font-bold text-xs transition-all flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-laptop-code"></i> برامج وتطبيقات الكمبيوتر
+                </button>
+                <button onclick="switchMainTab('أنظمة تشغيل الكمبيوتر', this)" class="tab-btn text-slate-400 hover:text-white px-5 py-2.5 rounded-lg font-bold text-xs transition-all flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-compact-disc"></i> أنظمة تشغيل الكمبيوتر
+                </button>
+                <button onclick="switchMainTab('تعاريف الحاسوب', this)" class="tab-btn text-slate-400 hover:text-white px-5 py-2.5 rounded-lg font-bold text-xs transition-all flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-gears"></i> تعاريف الحاسوب
+                </button>
+            </div>
+            <div id="nav-auth-container" class="hidden md:flex items-center border-r border-slate-700 pr-6 mr-2">
             </div>
         </div>
     </nav>
@@ -148,11 +164,9 @@
             <form onsubmit="publishNewApp(event)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <input type="text" id="app-name" placeholder="اسم البرنامج" required class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
                 <select id="app-category" class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
-                    <option value="متصفحات">متصفحات</option>
-                    <option value="أدوات مساعدة">أدوات مساعدة</option>
-                    <option value="الوسائط">الوسائط</option>
-                    <option value="الحماية">الحماية</option>
-                    <option value="ألعاب">ألعاب</option>
+                    <option value="برامج وتطبيقات الكمبيوتر">برامج وتطبيقات الكمبيوتر</option>
+                    <option value="أنظمة تشغيل الكمبيوتر">أنظمة تشغيل الكمبيوتر</option>
+                    <option value="تعاريف الحاسوب">تعاريف الحاسوب</option>
                 </select>
                 <input type="text" id="app-size" placeholder="الحجم (مثال: 50 MB)" required class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
                 <input type="text" id="app-version" placeholder="الإصدار (مثال: v2.0)" required class="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-white outline-none focus:ring-1 focus:ring-orange-500">
@@ -171,7 +185,7 @@
         <div class="max-w-screen-xl mx-auto px-4 py-8 md:py-12 space-y-12">
             <!-- All Products Grid -->
             <section id="product-grid-section" class="space-y-6 reveal">
-                <h3 class="text-2xl font-bold text-white flex items-center gap-2">
+                <h3 id="current-category-title" class="text-2xl font-bold text-white flex items-center gap-2">
                     <i class="fa-solid fa-th-large text-blue-600"></i> جميع البرامج
                 </h3>
                 <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
