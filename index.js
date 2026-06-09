@@ -1,4 +1,11 @@
-// جلب البيانات من التخزين المحلي للمتصفح أو البدء بمصفوفة فارغة إذا لم تكن هناك بيانات
+// إعدادات الربط - الخطوة الأولى: تغيير الروابط من محلي إلى سحابي هنا
+const CONFIG = {
+    // استبدل 'localhost' برابط الـ API أو Firebase الفعلي عند الرفع
+    DATABASE_URL: "https://your-project-id.firebaseio.com", 
+    ADMIN_TOKEN: "20obaida44" // يفضل مستقبلاً وضعها في متغيرات بيئة (Environment Variables)
+};
+
+// جلب البيانات (ملاحظة: حالياً نستخدم localStorage، للإنتاج يجب الربط بـ CONFIG.DATABASE_URL)
 let storedData = localStorage.getItem('my_apps_store');
 let appsDatabase = storedData ? JSON.parse(storedData) : [];
 
@@ -236,7 +243,7 @@ function switchMainTab(category, btn) {
 function renderStoreApps(appsArray) {
     const grid = document.getElementById("product-grid"); // Changed ID to product-grid
     const adminToken = sessionStorage.getItem('admin_token');
-    const isVerifiedAdmin = isAdminMode && adminToken === "20obaida44";
+    const isVerifiedAdmin = isAdminMode && adminToken === CONFIG.ADMIN_TOKEN;
     const categoryTitle = document.getElementById("current-category-title");
 
     // تحديث عنوان القسم ليعكس الفئة الحالية
@@ -397,7 +404,7 @@ function checkAdminAccess() {
     const urlParams = new URLSearchParams(window.location.search);
     const adminToken = urlParams.get('admin_gate_key');
 
-    if (adminToken === "20obaida44") {
+    if (adminToken === CONFIG.ADMIN_TOKEN) {
         isAdminMode = true;
         sessionStorage.setItem('isAdminSession', 'true');
         sessionStorage.setItem('admin_token', adminToken);
@@ -426,7 +433,7 @@ function renderCommentForm() {
     const navAuth = document.getElementById('nav-auth-container');
     if (!container) return;
 
-    const isVerifiedAdmin = isAdminMode && sessionStorage.getItem('admin_token') === "20obaida44";
+    const isVerifiedAdmin = isAdminMode && sessionStorage.getItem('admin_token') === CONFIG.ADMIN_TOKEN;
 
     const adminPanel = document.getElementById('admin-panel-overlay');
 
@@ -584,7 +591,7 @@ function logoutUser() {
 function handleCommentSubmit(event) {
     event.preventDefault();
 
-    const isVerifiedAdmin = isAdminMode && sessionStorage.getItem('admin_token') === "20obaida44";
+    const isVerifiedAdmin = isAdminMode && sessionStorage.getItem('admin_token') === CONFIG.ADMIN_TOKEN;
 
     // منع التعليق إذا لم يكن هناك مستخدم أو مسؤول
     if (!currentUser && !isVerifiedAdmin) {
@@ -653,7 +660,7 @@ function renderComments() {
     const container = document.getElementById("comments-display");
     container.innerHTML = "";
 
-    const isVerifiedAdmin = isAdminMode && sessionStorage.getItem('admin_token') === "20obaida44";
+    const isVerifiedAdmin = isAdminMode && sessionStorage.getItem('admin_token') === CONFIG.ADMIN_TOKEN;
     // إزالة شارة المسؤول إذا كانت موجودة
     const badge = document.getElementById('admin-badge'); // هذا العنصر سيتم حذفه من HTML أيضاً
 
